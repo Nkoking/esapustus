@@ -5,6 +5,6 @@
 On Debian based systems:
 ```shell
 sudo apt-get install python-pygame
-pip install pygame
+pip3 install pygame
 python3 esapustus.py
 ```
