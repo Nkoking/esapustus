@@ -13,8 +13,7 @@ gameDisplay = pygame.display.set_mode((display_width, display_height)) # setting
 pygame.display.set_caption('Ruoka apustus') # Text on the top of the window
 clock = pygame.time.Clock() # tick
 
-class Esine(): # Tämä on parent classi. Jokainen muu classi tässä ohjelmassa extendaa tätä, eli saavat kaikki sen funktiot itselleen myös
-# Tässä classissa on siis ideana että kaikki jotka hyödyntävät tätä voivat muuttaa X arvoaan
+class Esine(): # Parent class for all objects
     def __init__(self):
         self.rect = self.img.get_rect()
         self.rect.x = self.x
@@ -26,11 +25,9 @@ class Esine(): # Tämä on parent classi. Jokainen muu classi tässä ohjelmassa
         self.rect.x = self.x
         self.rect.y = self.y
 
-# Tässä luodaan ES esine, joka extendaa Esinettä
-class ES(Esine):
-    # Nää täällä ylhäällä on juttuja jotka on yleisesti kaikilla ES esineille
-    vauhti = 4 # Eli jokaisella es:llä on sama vauhti ja kuva
-    leveys = 100
+class ES(Esine): #Es class which extends esine class
+    speed = 4
+    width = 100
 
     def __init__(self):
         self.resetPosition()
@@ -39,22 +36,22 @@ class ES(Esine):
     def resetPosition(self):
         rand = random.randrange(0, 99)
         if rand == 0:
-            self.img = pygame.image.load('golden_es.png')
+            self.img = pygame.image.load('images/golden_es.png')
             self.point_value = 1000
         else:
-            self.img = pygame.image.load('es.png')
+            self.img = pygame.image.load('images/es.png')
             self.point_value = 1
-        self.x = random.randrange(0, display_width - self.leveys)
+        self.x = random.randrange(0, display_width - self.width)
         self.y = -30
 
 class Player(Esine):
-    img = pygame.image.load('apustus.png') # Images
-    leveys = 100
+    img = pygame.image.load('images/apustus.png') # Images
+    width = 100
 
     def __init__(self):
         self.x = (display_width * 0.45) # cordinates for player
         self.y = (display_height * 0.82)
-        self.pisteet = 0
+        self.points = 0
         Esine.__init__(self)
 
 def start():
@@ -80,7 +77,7 @@ def message_display(text): #text
 pointFont = pygame.font.Font('freesansbold.ttf', 20)
 
 def drawPoints(player):
-    textSurface = pointFont.render("Points: " + str(player.pisteet), False, (0, 0, 0))
+    textSurface = pointFont.render("Points: " + str(player.points), False, (0, 0, 0))
     gameDisplay.blit(textSurface, (0, 0))
 
 def crash(): # if you hit the edge you will crash + crash text
@@ -114,15 +111,15 @@ def game_loop(player, es): # game
         gameDisplay.fill(white) #drawing graphics
         gameDisplay.blit(player.img, (player.x, player.y))
 
-        es.move(dY=es.vauhti)
+        es.move(dY=es.speed)
         gameDisplay.blit(es.img, (es.x, es.y))
 
         drawPoints(player)
 
-        if player.x > (display_width - player.leveys) or player.x < 0: # if you hit edge you DIE
+        if player.x > (display_width - player.width) or player.x < 0: # if you hit edge you DIE
             crash()
         elif playerCollidesWithES(player, es):
-            player.pisteet += es.point_value
+            player.points += es.point_value
             es.resetPosition()
         elif es.y > display_height:
             crash()
@@ -131,5 +128,5 @@ def game_loop(player, es): # game
         clock.tick(60) # fps
 
 start()
-pygame.quit() # yes
+pygame.quit() 
 quit()
