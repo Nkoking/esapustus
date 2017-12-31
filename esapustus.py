@@ -8,6 +8,7 @@ display_height = 600
 
 black = (0,0,0)
 white = (255,255,255)
+deaths = 0
 
 gameDisplay = pygame.display.set_mode((display_width, display_height)) # setting resolution
 pygame.display.set_caption('Ruoka apustus') # Text on the top of the window
@@ -26,7 +27,7 @@ class Esine(): # Parent class for all objects
         self.rect.y = self.y
 
 class ES(Esine): #Es class which extends esine class
-    speed = 4
+    speed = 7
     width = 100
 
     def __init__(self):
@@ -49,45 +50,48 @@ class Player(Esine):
     width = 100
 
     def __init__(self):
-        self.x = (display_width * 0.45) # cordinates for player
+        self.x = (display_width * 0.45) # coordinates for player
         self.y = (display_height * 0.82)
         self.points = 0
         Esine.__init__(self)
 
 def start():
-    player = Player()
-    es = ES()
-    game_loop(player, es)
+    game_loop(Player(), ES())
 
-def text_objects(text, font): #text
+def text_objects(text, font):
     textSurface = font.render(text, True, black)
     return textSurface, textSurface.get_rect()
 
-def message_display(text): #text
-    newText = pygame.font.Font('freesansbold.ttf',70)
+def message_display(text):
+    newText = pygame.font.Font('freesansbold.ttf',30)
     TextSurf, TextRect = text_objects(text, newText)
     TextRect.center = ((display_width/2),(display_height/2))
     gameDisplay.blit(TextSurf, TextRect)
 
     pygame.display.update() # update display with text
-
-    time.sleep(2) # wait 2 seconds
+    key_pressed = False
+    while(key_pressed != True):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.KEYDOWN]:
+           key_pressed = True 
+        time.sleep(1)
     start()
 
 pointFont = pygame.font.Font('freesansbold.ttf', 20)
 
 def drawPoints(player):
-    textSurface = pointFont.render("Points: " + str(player.points), False, (0, 0, 0))
+    textSurface = pointFont.render("Points: " + str(player.points) + " Deaths: " + str(deaths), False, (0, 0, 0))
     gameDisplay.blit(textSurface, (0, 0))
 
-def crash(): # if you hit the edge you will crash + crash text
-    message_display('KaMErUS kUoLI')
+def crash(text): # if you hit the edge you will crash + crash text
+    global deaths
+    deaths  += 1
+    message_display(text)
 
 def playerCollidesWithES(player, es):
     return player.rect.colliderect(es.rect)
 
 def game_loop(player, es): # game
-    
     gameExit = False
     
     while not gameExit: # logic loop
@@ -116,13 +120,17 @@ def game_loop(player, es): # game
 
         drawPoints(player)
 
-        if player.x > (display_width - player.width) or player.x < 0: # if you hit edge you DIE
-            crash()
+        # if you hit edge you DIE
+        if player.x > (display_width - player.width) or player.x < 0: 
+            crash("You hit the edge. Hit any key to continue")
+            
         elif playerCollidesWithES(player, es):
             player.points += es.point_value
             es.resetPosition()
+
         elif es.y > display_height:
-            crash()
+            crash("You didnt catch the ES in time. Hit any key to continue")
+            
 
         pygame.display.update() # updating screen
         clock.tick(60) # fps
