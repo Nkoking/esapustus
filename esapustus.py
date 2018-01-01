@@ -48,7 +48,7 @@ class ES(Esine): #Es class which extends esine class
 class Player(Esine):
     img = pygame.image.load('images/apustus.png') # Images
     width = 100
-
+    
     def __init__(self):
         self.x = (display_width * 0.45) # coordinates for player
         self.y = (display_height * 0.82)
@@ -69,17 +69,11 @@ def message_display(text):
     gameDisplay.blit(TextSurf, TextRect)
 
     pygame.display.update() # update display with text
-    key_pressed = False
-    while(key_pressed != True):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.KEYDOWN]:
-           key_pressed = True 
-        time.sleep(1)
+    time.sleep(2)
     start()
 
-pointFont = pygame.font.Font('freesansbold.ttf', 20)
-
 def drawPoints(player):
+    pointFont = pygame.font.Font('freesansbold.ttf', 20)
     textSurface = pointFont.render("Points: " + str(player.points) + " Deaths: " + str(deaths), False, (0, 0, 0))
     gameDisplay.blit(textSurface, (0, 0))
 
@@ -92,9 +86,8 @@ def playerCollidesWithES(player, es):
     return player.rect.colliderect(es.rect)
 
 def game_loop(player, es): # game
-    gameExit = False
     
-    while not gameExit: # logic loop
+    while True: # logic loop
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -119,12 +112,8 @@ def game_loop(player, es): # game
         gameDisplay.blit(es.img, (es.x, es.y))
 
         drawPoints(player)
-
-        # if you hit edge you DIE
-        if player.x > (display_width - player.width) or player.x < 0: 
-            crash("You hit the edge. Hit any key to continue")
             
-        elif playerCollidesWithES(player, es):
+        if playerCollidesWithES(player, es):
             player.points += es.point_value
             es.resetPosition()
 
